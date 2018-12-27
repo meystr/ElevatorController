@@ -6,7 +6,6 @@ import rozanski.remigiusz.building.Floor;
 import rozanski.remigiusz.controller.Controller;
 import rozanski.remigiusz.elevator.Direction;
 import rozanski.remigiusz.elevator.Elevator;
-import rozanski.remigiusz.request.CallElevator;
 import rozanski.remigiusz.request.CallForFloor;
 
 
@@ -47,28 +46,32 @@ public class Main extends Thread {
 
         Random random = new Random();
         int randomFloor = random.nextInt(100);
+        int newRandomFloor = random.nextInt(100);
         Thread MyThread = new Thread();
         MyThread.start();
         while (true) {
             controller.addRequest(new CallForFloor(new Floor(randomFloor)));
+            controller.addRequest(new CallForFloor(new Floor(newRandomFloor)));
             System.out.println("Request elevator to the floor: " + randomFloor);
             System.out.println("Elevator is on the floor number: " + elevator.getCurrentFloor().getFloorNumber());
             if (randomFloor > elevator.getCurrentFloor().getFloorNumber()) {
                 elevator.setDirection(Direction.UP);
                 elevator.changeFloor();
+                if (randomFloor == elevator.getCurrentFloor().getFloorNumber()) {
+                    elevator.setDirection(Direction.STOP);
+                    controller.removeRequest();
+                }
             }
-            if (randomFloor < elevator.getCurrentFloor().getFloorNumber()){
+            if (randomFloor < elevator.getCurrentFloor().getFloorNumber()) {
                 elevator.setDirection(Direction.DOWN);
                 elevator.changeFloor();
+                if (randomFloor == elevator.getCurrentFloor().getFloorNumber()) {
+                    elevator.setDirection(Direction.STOP);
+                    controller.removeRequest();
+                }
             }
-            if (randomFloor == elevator.getCurrentFloor().getFloorNumber()) {
-                elevator.setDirection(Direction.STOP);
-                controller.removeRequest();
-                controller.addRequest(new CallForFloor(new Floor(randomFloor)));
-                // break;
-                // controller.reprioritizeRequests();
-                //  elevator.getCurrentFloor().setFloorNumber(randomFloor);
-               // continue;
+            if (randomFloor == elevator.getCurrentFloor().getFloorNumber() && elevator.getDirection() == Direction.STOP) {
+                System.out.println("Request elevator to the floor: " + newRandomFloor);
             }
             sleep(300);
         }
