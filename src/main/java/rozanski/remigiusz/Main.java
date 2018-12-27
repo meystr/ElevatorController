@@ -23,7 +23,7 @@ public class Main extends Thread {
         Controller controller = Controller.getInstance(elevator);
         Building building = new Building(floorList, controller);
         building.passFloorListToController(floorList);
-
+        elevator.setCurrentFloor(new Floor(55));
       /*  elevator.setDirection(Direction.DOWN);
         elevator.setCurrentFloor(new Floor(55));
         controller.addRequest(new CallForFloor(new Floor(50)));
@@ -51,9 +51,8 @@ public class Main extends Thread {
         MyThread.start();
         while (true) {
             controller.addRequest(new CallForFloor(new Floor(randomFloor)));
-           // controller.addRequest(new CallElevator(new Floor(randomFloor)));
-            System.out.println("Żądanie windy na piętro: " + randomFloor);
-            System.out.println("Winda jest na piętrze: " + elevator.getCurrentFloor().getFloorNumber());
+            System.out.println("Request elevator to the floor: " + randomFloor);
+            System.out.println("Elevator is on the floor number: " + elevator.getCurrentFloor().getFloorNumber());
             if (randomFloor > elevator.getCurrentFloor().getFloorNumber()) {
                 elevator.setDirection(Direction.UP);
                 elevator.changeFloor();
@@ -62,12 +61,14 @@ public class Main extends Thread {
                 elevator.setDirection(Direction.DOWN);
                 elevator.changeFloor();
             }
-            if (elevator.getCurrentFloor().getFloorNumber() == randomFloor) {
-                //controller.reprioritizeRequests();
-               // controller.getElevator().setCurrentFloor(elevator.getCurrentFloor());
-                controller.getElevator().getCurrentFloor().setFloorNumber(randomFloor);
+            if (randomFloor == elevator.getCurrentFloor().getFloorNumber()) {
+                elevator.setDirection(Direction.STOP);
+                controller.removeRequest();
                 controller.addRequest(new CallForFloor(new Floor(randomFloor)));
-            //    controller.addRequest(new CallElevator(new Floor(randomFloor)));
+                // break;
+                // controller.reprioritizeRequests();
+                //  elevator.getCurrentFloor().setFloorNumber(randomFloor);
+               // continue;
             }
             sleep(300);
         }
